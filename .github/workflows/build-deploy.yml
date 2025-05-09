@@ -1,0 +1,30 @@
+name: Build and Deploy WAR to Tomcat
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build WAR with Maven
+        run: mvn clean package --file pom.xml
+
+      - name: Deploy WAR to Tomcat
+        run: |
+          curl -v --upload-file target/yourapp.war "http://$TOMCAT_USERNAME:$TOMCAT_PASSWORD@$TOMCAT_HOST/manager/text/deploy?path=/yourapp&update=true"
+        env:
+          TOMCAT_USERNAME: ${{ secrets.TOMCAT_USERNAME }}
+          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
+          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
