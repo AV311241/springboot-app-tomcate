@@ -20,14 +20,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Inject finalName from secret into pom.xml
-        run: |
-          sed -i '/<build>/a \ \ \ \ <finalName>${{ secrets.APP_NAME }}</finalName>' pom.xml
+      # - name: Inject finalName from secret into pom.xml
+      #   run: |
+      #     sed -i '/<build>/a \ \ \ \ <finalName>${{ secrets.APP_NAME }}</finalName>' pom.xml
 
       - name: Build WAR using Maven
         run: mvn clean package --file pom.xml
 
       - name: Deploy WAR to Tomcat
         run: |
-          curl --upload-file target/${{ secrets.APP_NAME }}.war \
+          curl --upload-file target/springboot-war-app.war \
             "http://${{ secrets.TOMCAT_USERNAME }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/${{ secrets.APP_NAME }}&update=true"
