@@ -10,7 +10,7 @@ public class HelloController {
 
 	@GetMapping("")
 	public String home() {
-		return "My Spring boot War app is home page Abhishek verma";
+		return "automation chal rha";
 	}
 	
 	
