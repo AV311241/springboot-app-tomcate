@@ -6,10 +6,12 @@ on:
 
 jobs:
   deploy:
+    name: Build and Deploy to External Tomcat
     runs-on: ubuntu-latest
+    environment: springboot-app-tomcate
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Java
@@ -18,13 +20,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build WAR with Maven
+      - name: Inject finalName from secret into pom.xml
+        run: |
+          sed -i '/<build>/a \ \ \ \ <finalName>${{ secrets.APP_NAME }}</finalName>' pom.xml
+
+      - name: Build WAR using Maven
         run: mvn clean package --file pom.xml
 
       - name: Deploy WAR to Tomcat
         run: |
-          curl -v --upload-file target/yourapp.war "http://$TOMCAT_USERNAME:$TOMCAT_PASSWORD@$TOMCAT_HOST/manager/text/deploy?path=/yourapp&update=true"
-        env:
-          TOMCAT_USERNAME: ${{ secrets.TOMCAT_USERNAME }}
-          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
-          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
+          curl --upload-file target/${{ secrets.APP_NAME }}.war \
+            "http://${{ secrets.TOMCAT_USERNAME }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/${{ secrets.APP_NAME }}&update=true"
