@@ -18,5 +18,5 @@ public class SpringbootWarAppApplication extends SpringBootServletInitializer{
 	}
 	
 	
-
+   
 }
